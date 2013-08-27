@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="test/html; charset=utf-8">
+		<meta http-equiv="Content-Language" content="en">
+		<script src="app/library/mootools-core-1.4.5.js"></script>
+		<script src="app/library/mootools-more-1.4.0.1.js"></script>
+		<script src="app/library/composer/composer.js"></script>
+		<script src="app/library/composer/composer.relational.js"></script>
+		<script src="app/library/composer/composer.filtercollection.js"></script>
+		<script src="app/library/composer/composer.keyboard.js"></script>
+		<script>Composer.suppress_warnings = true;</script>
+		<script src="app/library/cowcrypt/convert.js"></script>
+		<script src="app/library/cowcrypt/crypto_math.js"></script>
+		<script src="app/library/cowcrypt/biginteger.js"></script>
+		<script src="app/library/cowcrypt/block_cipher.js"></script>
+		<script src="app/library/cowcrypt/hasher.js"></script>
+		<script src="app/library/cowcrypt/sha.js"></script>
+		<script src="app/library/cowcrypt/hmac.js"></script>
+		<script src="app/library/cowcrypt/aes.js"></script>
+		<script src="app/library/cowcrypt/rsa.js"></script>
+		<script src="app/library/cowcrypt/pbkdf2.js"></script>
+		<script src="app/library/tcrypt.js"></script>
+		<script src="app/library/timer.js"></script>
+		<script src="app/library/addon-adaptors/firefox.js"></script>
+		<script src="app/library/barfr.js"></script>
+		<script src="app/turtl/api.js"></script>
+		<script src="app/turtl/sync.js"></script>
+		<script src="app/models/_protected.js"></script>
+		<script src="app/models/persona.js"></script>
+		<script src="app/models/setting.js"></script>
+		<script src="app/models/user.js"></script>
+		<script src="rsa.js"></script>
+		<script src="user.js"></script>
+		<link rel="stylesheet" href="app/css/reset.css">
+		<link rel="stylesheet" href="app/css/modules/barfr.css">
+		<link rel="stylesheet" href="background.css">
+		<link rel="stylesheet" href="addon.css">
+		<link rel="stylesheet" href="user.css">
+		<script>alert('composer: ' + Composer);</script>
+	</head>
+	<body>
+		<div class="user-panel clear">
+			<img class="load" src="app/images/site/icons/load_16x16.gif" alt="WORKING" title="WORKING" width="16" height="16">
+			<div class="login">
+				<h1>
+					Log in
+				</h1>
+				<form name="login clear">
+					<input tabindex="1" type="text" name="username" value="" placeholder="username">
+					<input tabindex="2" type="password" name="password" value="" placeholder="password">
+					<input tabindex="3" type="submit" value="Login">
+				</form>
+			</div>
+
+			<div class="join clear">
+				<h1>
+					Create a new account
+				</h1>
+				<form name="join">
+					<input tabindex="5" type="text" name="username" value="" placeholder="username">
+					<div class="split clear">
+						<input tabindex="6" type="password" name="password" value="" placeholder="password">
+						<input tabindex="7" type="password" name="confirm" value="" placeholder="confirm password">
+					</div>
+					<div class="content">
+						<p>
+							<span class="error">You <em>must</em> <strong>remember
+							your username/password</strong>.</span>
+						</p>
+						<p>
+							Your password is used not only to log you in, but to decrypt all
+							of your data in Turtl. There is no password recovery feature
+							because we don't store your login information anywhere.
+							<a href="http://turtl.it/about" target="_blank">Read more.</a>
+						</p>
+					</div>
+					<input tabindex="9" type="submit" value="Join">
+				</form>
+			</div>
+		</div>
+	</body>
+</html>
+
