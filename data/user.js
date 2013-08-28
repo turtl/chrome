@@ -16,6 +16,18 @@ var note	=	function(txt)
 	barfr.barf(txt);
 };
 
+/**
+ * called after a successful join, loads the "ADD A PERSONA LOL" dialog into the
+ * current login box.
+ *
+ * NOTE: this duplicates a lot of the code in the menu.js lib, but since it's
+ * not loaded yet (and it would be a pain to load it JUST to open the personas)
+ * we duplicate. waaahh
+ */
+var open_personas	=	function()
+{
+};
+
 var submit_login	=	function(e)
 {
 	if(e) e.stop();
@@ -62,6 +74,12 @@ var submit_join	=	function(e)
 	var submit		=	form.getElement('input[type=submit]');
 
 	// error check
+	if(username.get('value').length < 4)
+	{
+		note('Your username must have four or more characters.');
+		username.focus();
+		return false;
+	}
 	if(password.get('value') != pconfirm.get('value'))
 	{
 		note('Your password does not match the confirmation.');
@@ -83,19 +101,38 @@ var submit_join	=	function(e)
 
 	submit.disabled	=	true;
 
-	var user	=	new User({
+	var user	=	new app.User({
 		username: username.get('value'),
 		password: password.get('value')
 	});
 	var auth	=	user.get_auth();
-	var key		=	tcrypt.key_to_string(user.get_key());
+	var key		=	app.tcrypt.key_to_string(user.get_key());
 	if(!auth) return;
 	loading(true);
-	addon.port.emit('join-submit', auth, key);
+	user.join({
+		success: function(userdata) {
+			var data = user.toJSON();
+			data.id = userdata.id;
+			app.turtl.user.set({
+				username: user.get('username'),
+				password: user.get('password')
+			});
+			app.turtl.user.login(data);
+			app.turtl.loading(false);
+
+			open_personas();
+		}.bind(this),
+		error: function(err) {
+			loading(false);
+			submit.disabled	=	false;
+			note(err);
+		}
+	});
 };
 
 window.addEvent('domready', function() {
 	barfr	=	new app.Barfr('barfr', {});
+	barfr.objects.container.dispose().inject(document.body, 'bottom');
 
 	var container	=	document.getElement('.user-panel');
 	container.addEvent('submit:relay(.login form)', submit_login);
@@ -105,36 +142,3 @@ window.addEvent('domready', function() {
 	if(login_username) login_username.focus();
 });
 
-/*
-addon.port.on('show', function() {
-});
-
-addon.port.on('login-success', function() {
-});
-
-addon.port.on('login-fail', function(status, err) {
-});
-
-addon.port.on('join-success', function() {
-	loading(false);
-	var username	=	document.getElement('.join input[name=username]');
-	var password	=	document.getElement('.join input[name=password]');
-	var pconfirm	=	document.getElement('.join input[name=confirm]');
-	if(username) username.set('value', '');
-	if(password) password.set('value', '');
-	if(pconfirm) pconfirm.set('value', '');
-});
-
-addon.port.on('join-fail', function(status, err) {
-	loading(false);
-	note(err);
-	this.submit.disabled	=	false;
-});
-
-addon.port.on('init', function(base) {
-	_base_url	=	base;
-});
-
-// hey ding-dong, we're done here
-addon.port.emit('loaded');
-*/

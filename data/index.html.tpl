@@ -23,14 +23,15 @@
 	<script src="../config.js"></script>
 {{genjs}}
 	<script src="templates.js"></script>
+	<!-- load the chrome app libraries -->
 	<script src="../comm.js"></script>
-	<script src="../panel.js"></script>
+	<script src="../main.js"></script>
 	<script src="../app.js"></script>
+	<script src="../panel.js"></script>
 	<script src="../bookmark.js"></script>
 	<script src="../personas.js"></script>
 	<script src="../invites.js"></script>
 	<script src="../about.js"></script>
-	<script src="../main.js"></script>
   </head>
   <body class="initial">
     <div id="loading-overlay">

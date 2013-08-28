@@ -20,9 +20,9 @@
 					Log in
 				</h1>
 				<form name="login clear">
-					<input tabindex="1" type="text" name="username" value="" placeholder="username">
-					<input tabindex="2" type="password" name="password" value="" placeholder="password">
-					<input tabindex="3" type="submit" value="Login">
+					<input type="text" name="username" value="" placeholder="username">
+					<input type="password" name="password" value="" placeholder="password">
+					<input type="submit" value="Login">
 				</form>
 			</div>
 
@@ -31,10 +31,10 @@
 					Create a new account
 				</h1>
 				<form name="join">
-					<input tabindex="5" type="text" name="username" value="" placeholder="username">
+					<input type="text" name="username" value="" placeholder="username">
 					<div class="split clear">
-						<input tabindex="6" type="password" name="password" value="" placeholder="password">
-						<input tabindex="7" type="password" name="confirm" value="" placeholder="confirm password">
+						<input type="password" name="password" value="" placeholder="password">
+						<input type="password" name="confirm" value="" placeholder="confirm password">
 					</div>
 					<div class="content">
 						<p>
@@ -48,8 +48,16 @@
 							<a href="http://turtl.it/about" target="_blank">Read more.</a>
 						</p>
 					</div>
-					<input tabindex="9" type="submit" value="Join">
+					<input type="submit" value="Join">
 				</form>
+			</div>
+		</div>
+
+		<div id="wrap-modal" style="display: none;">
+			<div id="wrap">
+				<div id="main" class="maincontent">
+					<div id="background_content" class="modalcontent clear"></div>
+				</div>
 			</div>
 		</div>
 	</body>
