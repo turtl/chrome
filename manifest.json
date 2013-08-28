@@ -6,13 +6,15 @@
 	"version": "0.0.1",
 
 	"permissions": [
+		"tabs",
+
 		"https://api.turtl.it/",
 		"http://api.turtl.it/",
 		"http://turtl.dev:8181/"
 	],
 
 	"background": {
-		"scripts": ["lib/main.js"]
+		"page": "data/index.html"
 	},
 
 	"browser_action": {
@@ -20,5 +22,7 @@
 		"default_popup": "data/user.html"
 	},
 
-	"incognito": "split"
+	"incognito": "split",
+
+	"content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'"
 }

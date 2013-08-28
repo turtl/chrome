@@ -1,5 +1,6 @@
 var barfr		=	null;
 var _base_url	=	null;
+var app			=	chrome.extension.getBackgroundPage();
 
 var loading	=	function(yesno)
 {
@@ -22,15 +23,32 @@ var submit_login	=	function(e)
 
 	var username	=	form.getElement('input[name=username]');
 	var password	=	form.getElement('input[name=password]');
-	var user	=	new User({
+	var user	=	new app.User({
 		username: username.get('value'),
 		password: password.get('value')
 	});
 	var auth	=	user.get_auth();
-	var key		=	tcrypt.key_to_string(user.get_key());
+	var key		=	app.tcrypt.key_to_string(user.get_key());
 	if(!auth) return;
 	loading(true);
-	addon.port.emit('login-submit', auth, key);
+	user.test_auth({
+		success: function(id) {
+			loading(false);
+			var data = user.toJSON();
+			data.id = id;
+			app.turtl.user.set({
+				username: user.get('username'),
+				password: user.get('password')
+			});
+			app.turtl.user.login(data);
+			app.turtl.loading(false);
+			window.close();
+		},
+		error: function(err) {
+			loading(false);
+			note(err);
+		}
+	});
 };
 
 var submit_join	=	function(e)
@@ -77,29 +95,24 @@ var submit_join	=	function(e)
 };
 
 window.addEvent('domready', function() {
-	barfr	=	new Barfr('barfr', {});
+	barfr	=	new app.Barfr('barfr', {});
 
 	var container	=	document.getElement('.user-panel');
 	container.addEvent('submit:relay(.login form)', submit_login);
 	container.addEvent('submit:relay(.join form)', submit_join);
-});
 
-addon.port.on('show', function() {
 	var login_username	=	document.getElement('.login input[name=username]');
 	if(login_username) login_username.focus();
 });
 
+/*
+addon.port.on('show', function() {
+});
+
 addon.port.on('login-success', function() {
-	loading(false);
-	var username	=	document.getElement('.login input[name=username]');
-	var password	=	document.getElement('.login input[name=password]');
-	if(username) username.set('value', '');
-	if(password) password.set('value', '');
 });
 
 addon.port.on('login-fail', function(status, err) {
-	loading(false);
-	note(err);
 });
 
 addon.port.on('join-success', function() {
@@ -124,4 +137,4 @@ addon.port.on('init', function(base) {
 
 // hey ding-dong, we're done here
 addon.port.emit('loaded');
-
+*/
