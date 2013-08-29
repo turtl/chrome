@@ -14,7 +14,7 @@
 	],
 
 	"background": {
-		"page": "data/index.html"
+		"page": "data/background.html"
 	},
 
 	"browser_action": {

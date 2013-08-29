@@ -116,7 +116,17 @@ cat index.html \
 	> background.html
 
 # create a basic modal/bare html structure
-perl -pi -e 'BEGIN{undef $/;} s|<body.*?</body>|\
+perl -pi -e 'BEGIN{undef $/;} s|</head>.*?</body>|\
+	<!-- load the chrome app libraries -->\
+	<script src="../comm.js"></script>\
+	<script src="../main.js"></script>\
+	<script src="../app.js"></script>\
+	<script src="../panel.js"></script>\
+	<script src="../bookmark.js"></script>\
+	<script src="../personas.js"></script>\
+	<script src="../invites.js"></script>\
+	<script src="../about.js"></script>\
+</head>\
 <body class="bare">\
 	<div id="wrap-modal">\
 		<div id="wrap">\

@@ -69,12 +69,8 @@ var menu	=	{
 			app.ext.invites.open(body, bg_inject);
 			break;
 		case 'logout':
-			app.ext.do_logout();
+			app.turtl.user.logout();
 			menu.close();
-			break;
-		case 'about':
-			menu.show_panel();
-			app.ext.about.open(body, bg_inject);
 			break;
 		}
 	}

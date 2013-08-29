@@ -139,6 +139,12 @@ window.addEvent('domready', function() {
 	container.addEvent('submit:relay(.join form)', submit_join);
 
 	var login_username	=	document.getElement('.login input[name=username]');
+	var login_password	=	document.getElement('.login input[name=password]');
 	if(login_username) login_username.focus();
+	login_username.addEvent('keydown', function(e) {
+		if(e.key != 'enter') return;
+		if(login_password.get('value') != '') return;
+		login_password.focus();
+	});
 });
 
