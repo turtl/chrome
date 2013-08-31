@@ -147,9 +147,11 @@ var ext	=	{
 
 			if(options.join)
 			{
+
 			}
 			else if(ext.invites.have_pending())
 			{
+				ext.invites.notify();
 			}
 		});
 	},
