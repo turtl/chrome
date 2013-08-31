@@ -16,18 +16,6 @@ var note	=	function(txt)
 	barfr.barf(txt);
 };
 
-/**
- * called after a successful join, loads the "ADD A PERSONA LOL" dialog into the
- * current login box.
- *
- * NOTE: this duplicates a lot of the code in the menu.js lib, but since it's
- * not loaded yet (and it would be a pain to load it JUST to open the personas)
- * we duplicate. waaahh
- */
-var open_personas	=	function()
-{
-};
-
 var submit_login	=	function(e)
 {
 	if(e) e.stop();
@@ -53,7 +41,6 @@ var submit_login	=	function(e)
 				password: user.get('password')
 			});
 			app.turtl.user.login(data);
-			app.turtl.loading(false);
 			window.close();
 		},
 		error: function(err) {
@@ -117,10 +104,11 @@ var submit_join	=	function(e)
 				username: user.get('username'),
 				password: user.get('password')
 			});
+			app.just_joined	=	true;	// let the addon know this is a join
 			app.turtl.user.login(data);
-			app.turtl.loading(false);
 
-			open_personas();
+			// route directly to the menu page/persona-join route
+			window.location	=	chrome.extension.getURL('data/menu.html') + '#personas-join';
 		}.bind(this),
 		error: function(err) {
 			loading(false);

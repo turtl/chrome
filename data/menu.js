@@ -1,4 +1,7 @@
-var app	=	chrome.extension.getBackgroundPage();
+var app		=	chrome.extension.getBackgroundPage();
+
+// release our last controller
+app.ext.panel.release();
 
 var menu	=	{
 	get_el: function()
@@ -64,6 +67,9 @@ var menu	=	{
 			menu.show_panel();
 			app.ext.personas.open(body, bg_inject);
 			break;
+		case 'personas-join':
+			menu.show_panel();
+			app.ext.personas.open(body, bg_inject, {join: true, add: true});
 		case 'invites':
 			menu.show_panel();
 			app.ext.invites.open(body, bg_inject);
@@ -80,6 +86,10 @@ window.addEvent('domready', function() {
 	var menu_ul	=	menu.get_el();
 	if(!menu_ul) return false;
 
+	// give ourselves a working barfr (by hijacking the background app's barfr)
+	app.barfr	=	new app.Barfr('barfr', {});
+	app.barfr.objects.container.dispose().inject(document.body, 'bottom');
+
 	// bind our menu items to the dispatch function LOLOLOL
 	menu_ul.addEvent('click:relay(a)', function(e) {
 		if(e) e.stop();
@@ -95,5 +105,10 @@ window.addEvent('domready', function() {
 	app.turtl.controllers.pages.bind('release-current', function() {
 		menu.show_pane();
 	});
+
+	if(window.location.hash.toString() != '')
+	{
+		menu.dispatch(window.location.hash.replace(/^#/, ''));
+	}
 });
 

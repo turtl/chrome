@@ -7,11 +7,19 @@
 
 	"permissions": [
 		"tabs",
+		"notifications",
 
 		"https://api.turtl.it/",
 		"http://api.turtl.it/",
-		"http://turtl.dev:8181/"
+		"http://turtl.dev:8181/",
+
+		"<all_urls>"
 	],
+
+	"content_scripts": [{
+		"matches": ["*://turtl.it/invites/*/*/*"],
+		"js": ["data/invite.scrape.js"]
+	}],
 
 	"background": {
 		"page": "data/background.html"
