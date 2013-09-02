@@ -32,9 +32,14 @@ ext.invites	=	{
 		});
 	},
 
+	num_pending: function()
+	{
+		return Object.keys(JSON.parse(localStorage.invites) || {}).length;
+	},
+
 	have_pending: function()
 	{
-		return Object.keys(JSON.parse(localStorage.invites) || {}).length > 0;
+		return ext.invites.num_pending() > 0;
 	},
 
 	init: function()
@@ -95,21 +100,38 @@ ext.invites	=	{
 		comm.trigger('invites-populate', JSON.parse(localStorage.invites));
 	},
 
-	/**
-	 * per-invite notification sender. has accept/deny buttons for invites that
-	 * don't use a shared secret.
-	 */
 	notify: function()
+	{
+		if(app.turtl.user.get('personas').models().length == 0) return false;
+
+		chrome.notifications.create('invites', {
+			type: 'image',
+			title: 'You have pending invites',
+			message: 'Open the `Invites` dialog in the Turtl menu to start sharing.',
+			iconUrl: chrome.extension.getURL('data/app/favicon_large.png'),
+			imageUrl: chrome.extension.getURL('data/invites-open.png')
+		});
+	},
+
+	/**
+	 * per-invite notifications. has accept/deny buttons for invites that don't
+	 * use a shared secret.
+	 */
+	notify_individual: function()
 	{
 		if(app.turtl.user.get('personas').models().length == 0) return false;
 
 		var invites	=	JSON.parse(localStorage.invites);
 		Object.each(invites, function(invite) {
+			var type	=	'basic';
 			var title	=	invite.type == 'b' ? 'Board' : 'Other';
 			title		+=	' invite '+ invite.code + ' from '+ invite.from;
 			var message	=	'';
+			var image	=	null;
 			if(invite.data.used_secret)
 			{
+				type	=	image;
+				image	=	chrome.extension.getURL('data/invites-open.png');
 				message	=	'This invite is locked with a shared secret. Open the `Invites` menu item to accept.';
 			}
 			else
@@ -120,10 +142,11 @@ ext.invites	=	{
 				];
 			}
 			chrome.notifications.create('invite:'+invite.id, {
-				type: 'basic',
+				type: type,
 				title: title,
 				iconUrl: chrome.extension.getURL('data/app/favicon_large.png'),
 				message: message,
+				imageUrl: image,
 				buttons: buttons
 			}, function() {});
 		});

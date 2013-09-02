@@ -164,6 +164,13 @@ var ext	=	{
 			{
 				// if we're here, the personas dialog is already showing. wait
 				// for it to close then show the invites notification
+				comm.bind('panel-close', function() {
+					comm.unbind('panel-close', arguments.callee);
+					if(ext.invites.have_pending())
+					{
+						ext.invites.notify();
+					}
+				});
 			}
 			else if(ext.invites.have_pending())
 			{

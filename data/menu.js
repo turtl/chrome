@@ -108,5 +108,15 @@ window.addEvent('domready', function() {
 	{
 		menu.dispatch(window.location.hash.replace(/^#/, ''));
 	}
+
+	// update invite count
+	var num_invites	=	app.ext.invites.num_pending();
+	console.log('menu: num inv: ', num_invites);
+	if(num_invites > 0)
+	{
+		var span	=	menu_ul.getElement('span.invite-count');
+		span.set('html', ' ('+ num_invites +')');
+		span.getParent().setStyle('font-weight', 'bold');
+	}
 });
 
