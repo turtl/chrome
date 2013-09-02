@@ -11,6 +11,9 @@ var just_joined	=	false;	// used to track joins (data/user.js)
  * all its libraries.
  */
 var ext	=	{
+	// holds "install" "upgrade" "downgrade" "open"
+	load_reason: false,
+
 	// tracks all open Turtl tabs
 	app_tabs: [],
 
@@ -21,26 +24,39 @@ var ext	=	{
 	setup: function()
 	{
 		ext.invites.init();
+		ext.personas.init();
+
+		// bind to login/logout
 		app.turtl.user.bind('login', function() {
 			ext.do_login({join: just_joined});
 			just_joined	=	false;
 		});
 		app.turtl.user.bind('logout', ext.do_logout);
+
+		// sometimes we want to open the personas dialogue from within the app
 		comm.bind('personas-add-open', function() {
 			var container	=	ext.panel.last_container;
 			var inject		=	ext.panel.last_inject;
 			ext.panel.release();
 			ext.personas.open(container, inject, {add: true});
 		});
+
+		// when we get a resize event from a panel controller, tell the panel
+		// to resize
 		comm.bind('resize', function() {
-			// when we get a resize event from a panel controller, tell the
-			// panel to resize
 			ext.panel.reset_height();
 		});
+
+		// when the main panel (ext popup) closes, release the controller loaded
+		// in the panel (if one exists)
 		comm.bind('panel-close', function() {
-			// when the main panel (ext popup) closes, release the controller
-			// loaded in the panel (if one exists)
 			ext.panel.release();
+		});
+
+		// bind to persona creationnnnnn, and attach an RSA key to new personas
+		comm.bind('persona-created', function(personadata) {
+			// we got a brand-spankin new persona. give it an RSA key.
+			ext.personas.attach_rsa_key_to_persona(personadata);
 		});
 	},
 
@@ -176,6 +192,13 @@ var ext	=	{
 			{
 				ext.invites.notify();
 			}
+
+			// make sure if we have a persona, it's got an RSA key
+			var persona	=	app.turtl.user.get('personas').first();
+			if(persona && !persona.has_rsa())
+			{
+				ext.personas.attach_rsa_key_to_persona(persona.toJSON());
+			}
 		});
 	},
 
@@ -210,6 +233,16 @@ chrome.tabs.onRemoved.addListener(function(tab_id, info) {
 	ext.close_app_tab(tab_id);
 });
 
+// listen for commands!
+chrome.commands.onCommand.addListener(function(cmd) {
+	switch(cmd)
+	{
+	case 'logout':
+		app.turtl.user.logout();
+		break;
+	}
+});
+
 // set up the app once all the background stuff is done loading
 comm.bind('loaded', function() {
 	ext.setup();
@@ -217,4 +250,20 @@ comm.bind('loaded', function() {
 
 // this sets up the main menu
 ext.do_logout({skip_setup: true, skip_unbind: true});
+
+// determine what kind of run we're doing
+var cur_version		=	chrome.app.getDetails().version;
+if(!localStorage.version)
+{
+	ext.load_reason	=	'install';
+}
+else
+{
+	var last_version	=	localStorage.version;
+	var comp			=	compare_versions(cur_version, last_version);
+	if(comp > 0) ext.load_reason = 'upgrade';
+	if(comp < 0) ext.load_reason = 'downgrade';
+	if(comp == 0) ext.load_reason = 'open';
+}
+localStorage.version	=	cur_version;
 
