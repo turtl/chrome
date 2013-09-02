@@ -167,6 +167,7 @@ var ext	=	{
 			}
 			else if(ext.invites.have_pending())
 			{
+				ext.invites.notify();
 			}
 		});
 	},

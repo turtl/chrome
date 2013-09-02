@@ -1,3 +1,6 @@
+/**
+ * TODO: wrap localStorage BS
+ */
 ext.invites	=	{
 	invite_valid: function(code, id, success)
 	{
@@ -92,10 +95,75 @@ ext.invites	=	{
 		comm.trigger('invites-populate', JSON.parse(localStorage.invites));
 	},
 
+	/**
+	 * per-invite notification sender. has accept/deny buttons for invites that
+	 * don't use a shared secret.
+	 */
 	notify: function()
 	{
-		// this chrome-specific function is used because we can't manually open
-		// the invites panel, the user has to do it themselves. sigh.
+		if(app.turtl.user.get('personas').models().length == 0) return false;
+
+		var invites	=	JSON.parse(localStorage.invites);
+		Object.each(invites, function(invite) {
+			var title	=	invite.type == 'b' ? 'Board' : 'Other';
+			title		+=	' invite '+ invite.code + ' from '+ invite.from;
+			var message	=	'';
+			if(invite.data.used_secret)
+			{
+				message	=	'This invite is locked with a shared secret. Open the `Invites` menu item to accept.';
+			}
+			else
+			{
+				var buttons	=	[
+					{title: 'Accept', iconUrl: chrome.extension.getURL('data/app/images/site/icons/check_16x16.png')},
+					{title: 'Deny', iconUrl: chrome.extension.getURL('data/app/images/site/icons/x_16x16.png')}
+				];
+			}
+			chrome.notifications.create('invite:'+invite.id, {
+				type: 'basic',
+				title: title,
+				iconUrl: chrome.extension.getURL('data/app/favicon_large.png'),
+				message: message,
+				buttons: buttons
+			}, function() {});
+		});
+
+		// bind to our invite accept/deny buttons
+		chrome.notifications.onButtonClicked.addListener(function(nid, bidx) {
+			if(!nid.match(/^invite:/)) return false;
+			var invite_id	=	nid.replace(/^invite:/, '');
+			var accept		=	(bidx == 0);
+			chrome.notifications.clear(nid, function() {});
+			var invites	=	JSON.parse(localStorage.invites);
+			var invite	=	new app.Invite(invites[invite_id]);
+			delete invites[invite_id];
+			//localStorage.invites	=	JSON.stringify(invites);
+
+			// create a invites controller so we don't duplicate a bunch of code
+			// doing accepts/denies
+			var invite_controller	=	new app.InvitesListController({
+				inject: new app.Element('div')
+			});
+			invite_controller.collection.add(invite);
+
+			// wrap our action in a fake event object
+			var ev	=	{
+				stop: function() {},
+				target: {
+					className: 'invite_'+invite_id,
+					get: function() { return 'li'; }
+				}
+			};
+
+			if(accept)
+			{
+				invite_controller.accept_invite(ev);
+			}
+			else
+			{
+				invite_controller.deny_invite(ev);
+			}
+		});
 	}
 };
 
