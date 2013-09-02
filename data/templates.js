@@ -251,8 +251,14 @@ _templates['invites/list'] = '<h1>Invites</h1>\
 							<? } ?>\
 							<a href="#deny" title="Deny invite"><img src="<?=img(\'/images/site/icons/x_16x16.png\')?>" width="16" height="16" alt="Deny"></a>\
 						</div>\
-						<?=(inv.type != \'b\' ? \'Other\' : \'Board\')?> invite\
-						<strong><?=inv.code?></strong>\
+						<? if(inv.from) { ?>\
+							<strong><?=inv.from.email?></strong>\
+							invited you to join a \
+							<?=(inv.type != \'b\' ? \'other\' : \'board\')?>\
+						<? } else {  ?>\
+							<?=(inv.type != \'b\' ? \'Other\' : \'Board\')?> invite\
+							<strong><?=inv.code?></strong>\
+						<? } ?>\
 						<? if(inv.data.used_secret) { ?>\
 							&nbsp;&nbsp;(locked invite, <a href="#unlock">enter secret to unlock</a>)\
 							<form class="secret">\

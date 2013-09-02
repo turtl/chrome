@@ -110,7 +110,7 @@ ext.invites	=	{
 			message: 'Open the `Invites` dialog in the Turtl menu to start sharing.',
 			iconUrl: chrome.extension.getURL('data/app/favicon_large.png'),
 			imageUrl: chrome.extension.getURL('data/invites-open.png')
-		});
+		}, function() {});
 	},
 
 	/**

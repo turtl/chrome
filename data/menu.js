@@ -111,12 +111,11 @@ window.addEvent('domready', function() {
 
 	// update invite count
 	var num_invites	=	app.ext.invites.num_pending();
-	console.log('menu: num inv: ', num_invites);
 	if(num_invites > 0)
 	{
-		var span	=	menu_ul.getElement('span.invite-count');
-		span.set('html', ' ('+ num_invites +')');
-		span.getParent().setStyle('font-weight', 'bold');
+		var atag	=	menu_ul.getElement('a.invites');
+		atag.set('html', atag.get('html') + ' ('+ num_invites +')');
+		atag.setStyle('font-weight', 'bold');
 	}
 });
 
