@@ -102,6 +102,7 @@ ext.invites	=	{
 
 	notify: function()
 	{
+		if(!ext.invites.have_pending() && !ext.messages.have_pending()) return false;
 		if(app.turtl.user.get('personas').models().length == 0) return false;
 
 		chrome.notifications.create('invites', {

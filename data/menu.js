@@ -109,12 +109,14 @@ window.addEvent('domready', function() {
 		menu.dispatch(window.location.hash.replace(/^#/, ''));
 	}
 
-	// update invite count
-	var num_invites	=	app.ext.invites.num_pending();
-	if(num_invites > 0)
+	// update invite/message count (they are folded together for now)
+	var num_invites		=	app.ext.invites.num_pending();
+	var num_messages	=	app.ext.messages.num_pending();
+	var num_total		=	num_invites + num_messages;
+	if(num_total > 0)
 	{
 		var atag	=	menu_ul.getElement('a.invites');
-		atag.set('html', atag.get('html') + ' ('+ num_invites +')');
+		atag.set('html', atag.get('html') + ' ('+ num_total +')');
 		atag.setStyle('font-weight', 'bold');
 	}
 });

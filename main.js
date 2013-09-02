@@ -58,6 +58,12 @@ var ext	=	{
 			// we got a brand-spankin new persona. give it an RSA key.
 			ext.personas.attach_rsa_key_to_persona(personadata);
 		});
+
+		// listen for new messages/notifications
+		comm.bind('new-message', function() {
+			// messages are folded into invites for now
+			ext.invites.notify();
+		});
 	},
 
 	/**
@@ -182,20 +188,14 @@ var ext	=	{
 				// for it to close then show the invites notification
 				comm.bind('panel-close', function() {
 					comm.unbind('panel-close', arguments.callee);
-					if(ext.invites.have_pending())
-					{
-						ext.invites.notify();
-					}
+					ext.invites.notify();
 				});
 			}
-			else if(ext.invites.have_pending())
-			{
-				ext.invites.notify();
-			}
+			ext.invites.notify();
 
 			// make sure if we have a persona, it's got an RSA key
 			var persona	=	app.turtl.user.get('personas').first();
-			if(persona && !persona.has_rsa())
+			if(persona && !persona.has_rsa({check_private: true}))
 			{
 				ext.personas.attach_rsa_key_to_persona(persona.toJSON());
 			}
