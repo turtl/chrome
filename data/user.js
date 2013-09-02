@@ -1,6 +1,7 @@
 var barfr		=	null;
 var _base_url	=	null;
 var app			=	chrome.extension.getBackgroundPage();
+var port		=	chrome.runtime.connect({name: 'panel'});	// knock knock
 
 var loading	=	function(yesno)
 {

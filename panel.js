@@ -1,4 +1,6 @@
 ext.panel	=	{
+	is_open: false,
+
 	last_container: null,
 	last_inject: null,
 	controller: null,
@@ -48,7 +50,7 @@ ext.panel	=	{
 			// to do this reaonably have failed. windows.getCurrent and 
 			// windows.getLastFocused both return a window id that makes the
 			// popup search turn up empty).
-			var popup		=	chrome.extension.getViews({type: 'popup'})[0];
+			var popup	=	chrome.extension.getViews({type: 'popup'})[0];
 			if(popup) popup.close();
 		});
 	},
@@ -57,9 +59,20 @@ ext.panel	=	{
 	{
 		var controller	=	ext.panel.controller;
 		if(controller && controller.release) controller.release();
-	}
+	},
 };
 
-comm.bind('resize', function() {
-	ext.panel.reset_height();
+// listen dor connect/disconnect (lets us know when the panel opens/closes).
+// note that the content in the panel (user panel/menu) must manually connect to
+// the port we open here.
+chrome.runtime.onConnect.addListener(function(port) {
+	if(port.name != 'panel') return;
+	comm.trigger('panel-open');
+	ext.panel.is_open	=	true;
+	port.onDisconnect.addListener(function() {
+		port.onDisconnect.removeListener(arguments.callee);
+		ext.panel.is_open	=	false;
+		comm.trigger('panel-close');
+	});
 });
+

@@ -1,7 +1,5 @@
 var app		=	chrome.extension.getBackgroundPage();
-
-// release our last controller
-app.ext.panel.release();
+var port	=	chrome.runtime.connect({name: 'panel'});	// knock knock
 
 var menu	=	{
 	get_el: function()

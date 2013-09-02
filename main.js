@@ -2,7 +2,7 @@
 // not rely on that fact
 var app			=	chrome.extension.getBackgroundPage();
 var comm		=	new Comm();
-var just_joined	=	false;
+var just_joined	=	false;	// used to track joins (data/user.js)
 
 /**
  * This is the main extension object. Not only does it hold a number of function
@@ -11,6 +11,7 @@ var just_joined	=	false;
  * all its libraries.
  */
 var ext	=	{
+	// tracks all open Turtl tabs
 	app_tabs: [],
 
 	/**
@@ -30,6 +31,16 @@ var ext	=	{
 			var inject		=	ext.panel.last_inject;
 			ext.panel.release();
 			ext.personas.open(container, inject, {add: true});
+		});
+		comm.bind('resize', function() {
+			// when we get a resize event from a panel controller, tell the
+			// panel to resize
+			ext.panel.reset_height();
+		});
+		comm.bind('panel-close', function() {
+			// when the main panel (ext popup) closes, release the controller
+			// loaded in the panel (if one exists)
+			ext.panel.release();
 		});
 	},
 
@@ -60,7 +71,9 @@ var ext	=	{
 			chrome.tabs.create({
 				url: chrome.extension.getURL('/data/index.html'),
 			}, function(tab) {
-				// setup comm for this tab
+				// set up a PERSONALIZED comm for this tab, allowing it to pass
+				// its own events around without muddying up our global comm
+				// object
 				tab.comm	=	new Comm();
 				ext.setup_tab(tab.comm);
 
@@ -68,7 +81,6 @@ var ext	=	{
 				ext.app_tabs.push(tab);
 
 				// make sure the app tab uses this tab's specific comm object
-				// (OR ELSE)
 				(function() {
 					var tab_window	=	chrome.extension.getViews({type: 'tab', windowId: window_id})[0];
 					if(tab_window) tab_window._comm = tab.comm;
@@ -77,7 +89,7 @@ var ext	=	{
 		});
 	},
 
-	close_tab: function(tab_id)
+	close_app_tab: function(tab_id)
 	{
 		ext.app_tabs	=	ext.app_tabs.filter(function(tab) {
 			// if the tab is being removed, unbind its comm object
@@ -87,7 +99,9 @@ var ext	=	{
 	},
 
 	/**
-	 * Set up event listening/forwarding for a newly opened app tab
+	 * Set up event listening/forwarding for a newly opened app tab. Mainly what
+	 * we do here is wire up events between the new tab's port (tabcomm) and the
+	 * global/background port (comm).
 	 */
 	setup_tab: function(tabcomm)
 	{
@@ -107,6 +121,7 @@ var ext	=	{
 			// the addon)
 			comm.trigger('do-sync');
 		});
+		tabcomm.bind('personas-add-open', function() { comm.trigger('personas-add-open'); });
 	},
 
 	/**
@@ -131,7 +146,7 @@ var ext	=	{
 	},
 
 	/**
-	 * Called when a user logs in (via the ext loogin popup).
+	 * Called when a user logs in (via the ext login popup).
 	 */
 	do_login: function(options)
 	{
@@ -147,6 +162,8 @@ var ext	=	{
 
 			if(options.join)
 			{
+				// if we're here, the personas dialog is already showing. wait
+				// for it to close then show the invites notification
 			}
 			else if(ext.invites.have_pending())
 			{
@@ -182,7 +199,7 @@ var ext	=	{
 
 // listen for tab closes and update our app tab list as needed
 chrome.tabs.onRemoved.addListener(function(tab_id, info) {
-	ext.close_tab(tab_id);
+	ext.close_app_tab(tab_id);
 });
 
 // set up the app once all the background stuff is done loading

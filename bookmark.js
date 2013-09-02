@@ -1,17 +1,33 @@
 ext.bookmark	=	{
 	get_content_type: function(url, finishcb)
 	{
-		var xhr	=	new XMLHttpRequest();
-		xhr.open('GET', url, true);
-		xhr.onreadystatechange	=	function()
+		if(url.match(/^https?:/))
 		{
-			if(xhr.readyState == 4)
+			var xhr	=	new XMLHttpRequest();
+			xhr.open('GET', url, true);
+			xhr.onreadystatechange	=	function()
 			{
-				var content_type = xhr.getResponseHeader('Content-Type');
-				finishcb(content_type);
+				if(xhr.readyState == 4)
+				{
+					var content_type = xhr.getResponseHeader('Content-Type');
+					finishcb(content_type);
+				}
 			}
+			xhr.send();
 		}
-		xhr.send();
+		else if(url.match(/^file:/))
+		{
+			var type	=	'text/html';
+			if(url.match(/\.(jpe?g|gif|png|bmp)$/))
+			{
+				type	=	'image/'+url.replace(/^.*\.(jpe?g|gif|png|bmp)$/, '$1');
+			}
+			(function() { finishcb(type); }).delay(0, this);
+		}
+		else
+		{
+			(function() { finishcb('text/html'); }).delay(0, this);
+		}
 	},
 
 	open: function(container, inject, options)
@@ -45,24 +61,32 @@ ext.bookmark	=	{
 				});
 			};
 
-			ext.bookmark.get_content_type(tab.url, function(content_type) {
-				type	=	content_type.match(/^image/) ? 'image' : 'link';
-				if(type == 'image')
-				{
-					do_open({});
-				}
-				else
-				{
-					chrome.runtime.onMessage.addListener(function(req, sender) {
-						if(req.type == 'bookmark-scrape')
-						{
-							(function() { do_open(req.data); }).delay(0, this);
-							chrome.runtime.onMessage.removeListener(arguments.callee);
-						}
-					});
-					chrome.tabs.executeScript(null, {file: 'data/bookmark.scrape.js'});
-				}
-			});
+			if(tab.url.match(/^chrome/))
+			{
+				type	=	'link';
+				do_open({image: false});
+			}
+			else
+			{
+				ext.bookmark.get_content_type(tab.url, function(content_type) {
+					type	=	content_type.match(/^image/) ? 'image' : 'link';
+					if(type == 'image')
+					{
+						do_open({});
+					}
+					else
+					{
+						chrome.runtime.onMessage.addListener(function(req, sender) {
+							if(req.type == 'bookmark-scrape')
+							{
+								(function() { do_open(req.data); }).delay(0, this);
+								chrome.runtime.onMessage.removeListener(arguments.callee);
+							}
+						});
+						chrome.tabs.executeScript(null, {file: 'data/bookmark.scrape.js'});
+					}
+				});
+			}
 		});
 	}
 };
