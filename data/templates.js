@@ -691,6 +691,11 @@ _templates['personas/list'] = '<? personas.each(function(p) { ?>\
 	<li class="persona_<?=p.id?> clear">\
 		<h3><?=p.email?></h3>\
 		<small><?=p.name?></small>\
+		<? if(p.has_key) { ?>\
+			<small class="success">(RSA 3072)</small>\
+		<? } else { ?>\
+			<small>(generating RSA key)</small>\
+		<? } ?>\
 		<? if(show_edit) { ?>\
 			<ul>\
 				<li>\
