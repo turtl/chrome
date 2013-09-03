@@ -32,6 +32,8 @@ echo -n "Zipping..."
 zip -r turtl.crx \
 	. \
 	-x *.git* \
+	-x turtl.zip \
+	-x turtl.crx \
 	> /dev/null
 echo "done."
 
