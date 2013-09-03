@@ -15,7 +15,7 @@ cssfiles="`find app/css -name '*.css' \
 	| sort \
 	| grep -v 'template.css' \
 	| grep -v 'reset.css' \
-	| grep -v 'general.css' `"" background.css"
+	| grep -v 'general.css' `"
 for cssfile in $cssfiles; do
 	css="$css"'\n'"<link rel=\"stylesheet\" href=\"$cssfile\">"
 done
