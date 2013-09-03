@@ -8,7 +8,7 @@
 		"16": "data/app/favicon.png",
 		"128": "data/app/favicon_large.png"
 	},
-	"minimum_chrome_version": "28.0"
+	"minimum_chrome_version": "28.0",
 
 	"permissions": [
 		"tabs",
