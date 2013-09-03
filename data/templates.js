@@ -465,8 +465,6 @@ _templates['notes/index'] = '<div class="note-actions">\
 		</li>\
 		-->\
 	</ul>\
-	<input type="text" name="search" placeholder="Search board notes">\
-	<a href="#clear-filters" class="clear" title="Reset all search filters (shortcut `x`)">clear filters</a>\
 </div>\
 <ul class="clear note_list list_<?=display_type?>"></ul>\
 ';
@@ -755,6 +753,10 @@ _templates['tags/index'] = '<!--\
 	</ul>\
 </div>\
 -->\
+<input type="text" name="search" placeholder="Search notes" title="Search notes in this board (shortcut `f`)">\
+<a href="#clear-filters" class="clear" title="Reset all search filters (shortcut `x`)">clear filters</a>\
+<span class="clearMe"></span>\
+\
 <ul class="tags"></ul>\
 ';
 
