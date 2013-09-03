@@ -2,7 +2,7 @@
 
 # temp dir for packaging
 TMP=/tmp/turtl-package-chrome
-CRX=turtl.crx
+CRX=turtl.zip
 
 nogen=$1
 
