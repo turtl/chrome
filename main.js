@@ -237,6 +237,9 @@ chrome.tabs.onRemoved.addListener(function(tab_id, info) {
 chrome.commands.onCommand.addListener(function(cmd) {
 	switch(cmd)
 	{
+	case 'open':
+		if(app.turtl.user.logged_in) ext.open_app();
+		break;
 	case 'logout':
 		app.turtl.user.logout();
 		break;

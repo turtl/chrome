@@ -37,8 +37,14 @@
 	"commands": {
 		"_execute_browser_action": {
 			"suggested_key": {
-				"default": "Ctrl+Tab"
+				"default": "Ctrl+Down"
 			}
+		},
+		"open": {
+			"suggested_key": {
+				"default": "Ctrl+Up"
+			},
+			"description": "Open the Turtl app tab."
 		},
 		"logout": {
 			"suggested_key": {
