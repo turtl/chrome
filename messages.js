@@ -1,4 +1,11 @@
 ext.messages	=	{
+	init: function()
+	{
+		comm.bind('message-remove', function() {
+			comm.trigger('invites-change');
+		});
+	},
+
 	num_pending: function()
 	{
 		var messages	=	app.turtl.messages;

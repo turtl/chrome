@@ -24,6 +24,7 @@ var ext	=	{
 	setup: function()
 	{
 		ext.invites.init();
+		ext.messages.init();
 		ext.personas.init();
 
 		// bind to login/logout
@@ -63,6 +64,12 @@ var ext	=	{
 		comm.bind('new-message', function() {
 			// messages are folded into invites for now
 			ext.invites.notify();
+		});
+
+
+		// listen for changes in invite/message data
+		comm.bind('invites-change', function() {
+			ext.update_badge();
 		});
 	},
 
@@ -192,6 +199,7 @@ var ext	=	{
 				});
 			}
 			ext.invites.notify();
+			ext.update_badge();
 
 			// make sure if we have a persona, it's got an RSA key
 			var persona	=	app.turtl.user.get('personas').first();
@@ -222,7 +230,20 @@ var ext	=	{
 
 		// run setup again
 		if(!options.skip_setup) ext.setup();
-	}
+	},
+
+	update_badge: function()
+	{
+		var badge	=	'';
+		if(app.turtl.user.logged_in)
+		{
+			badge	=	ext.invites.num_pending() + ext.messages.num_pending();
+			badge	=	badge.toString();
+		}
+		console.log('badge: ', badge);
+		if(badge == '0') badge = '';
+		chrome.browserAction.setBadgeText({text: badge});
+	},
 
 	// NOTE: other libs (bookmark, personas, etc) will add their own objects
 	// into the `ext` namespace

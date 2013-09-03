@@ -50,6 +50,7 @@ ext.invites	=	{
 			var invites	=	JSON.parse(localStorage.invites);
 			delete invites[invite_id];
 			localStorage.invites	=	JSON.stringify(invites);
+			comm.trigger('invites-change');
 		});
 
 		// give it a path with some invite data and this splits out the correct
@@ -102,6 +103,7 @@ ext.invites	=	{
 
 	notify: function()
 	{
+		comm.trigger('invites-change');
 		if(!ext.invites.have_pending() && !ext.messages.have_pending()) return false;
 		if(app.turtl.user.get('personas').models().length == 0) return false;
 
