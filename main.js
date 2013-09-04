@@ -169,7 +169,7 @@ var ext	=	{
 		else
 		{
 			chrome.browserAction.setIcon({
-				path: '/data/app/favicon.png'
+				path: '/data/app/favicon.19.png'
 			});
 		}
 	},
@@ -225,7 +225,7 @@ var ext	=	{
 
 		chrome.browserAction.setPopup({popup: '/data/user.html'});
 		chrome.browserAction.setIcon({
-			path: '/data/app/favicon_gray.png'
+			path: '/data/app/favicon.19.gray.png'
 		});
 
 		// run setup again

@@ -6,7 +6,7 @@
 	"version": "0.1.2",
 	"icons": {
 		"16": "data/app/favicon.png",
-		"128": "data/app/favicon_large.png"
+		"128": "data/app/favicon.128.png"
 	},
 	"minimum_chrome_version": "28.0",
 
@@ -31,7 +31,7 @@
 	},
 
 	"browser_action": {
-		"default_icon": "data/app/favicon_gray.png",
+		"default_icon": "data/app/favicon.19.gray.png",
 		"default_popup": "data/user.html"
 	},
 
