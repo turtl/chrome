@@ -162,5 +162,7 @@ var Comm	=	(function() {
 	this.unbind_context	=	unbind_context;
 	this.trigger		=	trigger;
 	this.num_bindings	=	num_bindings;
+	this._bindings		=	function() { return bindings; };
+	this._context		=	function() { return contexts; };
 });
 
