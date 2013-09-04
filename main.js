@@ -240,7 +240,6 @@ var ext	=	{
 			badge	=	ext.invites.num_pending() + ext.messages.num_pending();
 			badge	=	badge.toString();
 		}
-		console.log('badge: ', badge);
 		if(badge == '0') badge = '';
 		chrome.browserAction.setBadgeText({text: badge});
 	},
