@@ -17,6 +17,9 @@ var ext	=	{
 	// tracks all open Turtl tabs
 	app_tabs: [],
 
+	// holds the tab object of the last tab opened
+	last_opened_tab: false,
+
 	/**
 	 * Called on extension init. Initializes any listeners for the "clean slate"
 	 * addon state.
@@ -120,11 +123,11 @@ var ext	=	{
 				// track the tab/window pair
 				ext.app_tabs.push(tab);
 
-				// make sure the app tab uses this tab's specific comm object
-				(function() {
-					var tab_window	=	chrome.extension.getViews({type: 'tab', windowId: window_id})[0];
-					if(tab_window) tab_window._comm = tab.comm;
-				}).delay(0, this);
+				// track last opened tab so it can grab its own comm object from
+				// ext once it runs its setup. bit of a hack, but hoesntly works
+				// 10x better than trying to pull out the window object via
+				// ext.getViews() and trying to time the injection right. ugh.
+				ext.last_opened_tab	=	tab;
 			});
 		});
 	},
