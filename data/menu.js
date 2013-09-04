@@ -74,6 +74,7 @@ var menu	=	{
 		case 'personas-join':
 			menu.show_panel();
 			app.ext.personas.open(body, bg_inject, {join: true, add: true});
+			break;
 		case 'invites':
 			menu.show_panel();
 			app.ext.invites.open(body, bg_inject);
