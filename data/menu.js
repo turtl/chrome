@@ -137,9 +137,9 @@ window.addEvent('domready', function() {
 		rsagen.setStyle('display', is_gen ? 'block' : '');
 		menu.reset_height();
 	};
-	app.comm.bind('rsa-gen', update_rsa_gen);
-	app.comm.bind('rsa-key', update_rsa_gen);
-	app.comm.bind('rsa-pop', update_rsa_gen);
+	app.comm.bind('rsa-gen', update_rsa_gen, 'panel');
+	app.comm.bind('rsa-key', update_rsa_gen, 'panel');
+	app.comm.bind('rsa-pop', update_rsa_gen, 'panel');
 	update_rsa_gen();
 	var inp_rsa	=	rsagen.getElement('input[name=notify-rsa]');
 	console.log('inp: ', inp_rsa);

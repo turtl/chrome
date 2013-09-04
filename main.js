@@ -55,6 +55,7 @@ var ext	=	{
 		// in the panel (if one exists)
 		comm.bind('panel-close', function() {
 			ext.panel.release();
+			comm.unbind_context('panel');
 		});
 
 		// bind to persona creationnnnnn, and attach an RSA key to new personas
@@ -141,7 +142,7 @@ var ext	=	{
 			{
 				tab.comm.unbind();
 				tab.comm	=	false;
-				tab._unbind_comm();
+				comm.unbind_context(tab);
 			}
 			return !(tab.id == tab_id);
 		});
@@ -154,23 +155,17 @@ var ext	=	{
 	 */
 	setup_tab: function(tab)
 	{
-		// define these functions explicitely so we can add a function into the
-		// tab object to unbind them manually later (if the tab closes, for 
-		// instance).
-		var do_profile_mod	=	function()
-		{
+		// forward some background comm events to this tab's comm. note that we
+		// pass the tab object as the binding context (useful for unbinding all
+		// the tab's events later on)
+		comm.bind('profile-mod', function() {
 			tab.comm.trigger('profile-mod');
-		};
-		var do_profile_sync	=	function()
-		{
+		}, tab);
+		comm.bind('profile-sync', function() {
 			var args	=	Array.prototype.slice.call(arguments, 0)
 			args		=	['profile-sync'].concat(args);
 			tab.comm.trigger.apply(tab.comm, args);
-		};
-
-		// forward some background comm events to this tab's comm
-		comm.bind('profile-mod', do_profile_mod);
-		comm.bind('profile-sync', do_profile_sync);
+		}, tab);
 
 		tab.comm.bind('profile-mod', function() {
 			// the profile was modified by hand (`profile-mod` does its
@@ -181,16 +176,6 @@ var ext	=	{
 			comm.trigger('do-sync');
 		});
 		tab.comm.bind('personas-add-open', function() { comm.trigger('personas-add-open'); });
-
-		// give the tab a funciton it can call to clear its comm bindings. we
-		// could do it from within the bindings themselves, but that require the
-		// bindings be called, which is a bit dirtier than just cleaning
-		// everything up when the tab closes.
-		tab._unbind_comm	=	function()
-		{
-			comm.unbind('profile-mod', do_profile_mod);
-			comm.unbind('profile-sync', do_profile_sync);
-		};
 	},
 
 	/**
