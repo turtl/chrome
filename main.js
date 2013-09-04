@@ -141,6 +141,7 @@ var ext	=	{
 			{
 				tab.comm.unbind();
 				tab.comm	=	false;
+				tab._unbind_comm();
 			}
 			return !(tab.id == tab_id);
 		});
@@ -153,31 +154,23 @@ var ext	=	{
 	 */
 	setup_tab: function(tab)
 	{
-		// forward some background comm events to this tab's comm
-		comm.bind('profile-mod', function() {
-			// make sure that if the tab was closed (pfff why would anyone close
-			// turtl, right?? I mean, RIGHT?!?!) that we clean up any event
-			// pushing to the tab
-			if(!tab.comm)
-			{
-				comm.unbind('profile-mod', arguments.callee);
-				return false;
-			}
+		// define these functions explicitely so we can add a function into the
+		// tab object to unbind them manually later (if the tab closes, for 
+		// instance).
+		var do_profile_mod	=	function()
+		{
 			tab.comm.trigger('profile-mod');
-		});
-		comm.bind('profile-sync', function() {
-			// make sure that if the tab was closed (pfff why would anyone close
-			// turtl, right?? I mean, RIGHT?!?!) that we clean up any event
-			// pushing to the tab
-			if(!tab.comm)
-			{
-				comm.unbind('profile-sync', arguments.callee);
-				return false;
-			}
+		};
+		var do_profile_sync	=	function()
+		{
 			var args	=	Array.prototype.slice.call(arguments, 0)
 			args		=	['profile-sync'].concat(args);
 			tab.comm.trigger.apply(tab.comm, args);
-		});
+		};
+
+		// forward some background comm events to this tab's comm
+		comm.bind('profile-mod', do_profile_mod);
+		comm.bind('profile-sync', do_profile_sync);
 
 		tab.comm.bind('profile-mod', function() {
 			// the profile was modified by hand (`profile-mod` does its
@@ -188,6 +181,16 @@ var ext	=	{
 			comm.trigger('do-sync');
 		});
 		tab.comm.bind('personas-add-open', function() { comm.trigger('personas-add-open'); });
+
+		// give the tab a funciton it can call to clear its comm bindings. we
+		// could do it from within the bindings themselves, but that require the
+		// bindings be called, which is a bit dirtier than just cleaning
+		// everything up when the tab closes.
+		tab._unbind_comm	=	function()
+		{
+			comm.unbind('profile-mod', do_profile_mod);
+			comm.unbind('profile-sync', do_profile_sync);
+		};
 	},
 
 	/**
