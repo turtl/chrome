@@ -1,5 +1,6 @@
 ext.personas	=	{
 	generating_key: false,
+	notify_rsa_gen: false,
 
 	init: function()
 	{
@@ -33,6 +34,15 @@ ext.personas	=	{
 		localStorage.rsa_keys	=	JSON.stringify(keys);
 		comm.trigger('rsa-key');
 		console.log('rsa: push key');
+		if(ext.personas.notify_rsa_gen)
+		{
+			chrome.notifications.create('rsa-done', {
+				type: 'basic',
+				title: 'RSA key generation complete',
+				message: 'You can now share with others!',
+				iconUrl: chrome.extension.getURL('data/app/favicon_large.png')
+			}, function() {});
+		}
 	},
 
 	pop_key: function()
@@ -44,12 +54,14 @@ ext.personas	=	{
 		localStorage.rsa_keys	=	JSON.stringify(keys);
 		//if(keys.length == 0) ext.personas.generate_rsa_key();
 		console.log('rsa: pop key');
+		comm.trigger('rsa-pop');
 		return key;
 	},
 
 	generate_rsa_key: function()
 	{
 		console.log('rsa: gen key');
+		comm.trigger('rsa-gen');
 		ext.personas.generating_key	=	true;
 		app.tcrypt.generate_rsa_keypair({
 			success: function(rsakey) {
