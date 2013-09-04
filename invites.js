@@ -99,6 +99,7 @@ ext.invites	=	{
 			width: 600
 		});
 		comm.trigger('invites-populate', JSON.parse(localStorage.invites));
+		chrome.notifications.clear('invites', function() {});
 	},
 
 	notify: function()
