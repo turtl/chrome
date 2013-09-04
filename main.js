@@ -23,6 +23,9 @@ var ext	=	{
 	 */
 	setup: function()
 	{
+		// remove all events
+		comm.unbind();
+
 		ext.invites.init();
 		ext.messages.init();
 		ext.personas.init();
@@ -66,10 +69,17 @@ var ext	=	{
 			ext.invites.notify();
 		});
 
-
 		// listen for changes in invite/message data
 		comm.bind('invites-change', function() {
 			ext.update_badge();
+		});
+	},
+
+	find_app_tabs: function(tab_id)
+	{
+		return ext.app_tabs.filter(function(tab) {
+			// if the tab is being removed, unbind its comm object
+			return (tab.id == tab_id)
 		});
 	},
 
@@ -104,7 +114,7 @@ var ext	=	{
 				// its own events around without muddying up our global comm
 				// object
 				tab.comm	=	new Comm();
-				ext.setup_tab(tab.comm);
+				ext.setup_tab(tab);
 
 				// track the tab/window pair
 				ext.app_tabs.push(tab);
@@ -118,11 +128,20 @@ var ext	=	{
 		});
 	},
 
-	close_app_tab: function(tab_id)
+	close_app_tab: function(tab_id, options)
 	{
+		options || (options = {});
+
+		// close the tab if needed
+		if(options.do_close) chrome.tabs.remove(tab_id);
+
 		ext.app_tabs	=	ext.app_tabs.filter(function(tab) {
 			// if the tab is being removed, unbind its comm object
-			if(tab.id == tab_id) tab.comm.unbind();
+			if(tab.id == tab_id)
+			{
+				tab.comm.unbind();
+				tab.comm	=	false;
+			}
 			return !(tab.id == tab_id);
 		});
 	},
@@ -132,17 +151,35 @@ var ext	=	{
 	 * we do here is wire up events between the new tab's port (tabcomm) and the
 	 * global/background port (comm).
 	 */
-	setup_tab: function(tabcomm)
+	setup_tab: function(tab)
 	{
 		// forward some background comm events to this tab's comm
-		comm.bind('profile-mod', function() { tabcomm.trigger('profile-mod'); });
+		comm.bind('profile-mod', function() {
+			// make sure that if the tab was closed (pfff why would anyone close
+			// turtl, right?? I mean, RIGHT?!?!) that we clean up any event
+			// pushing to the tab
+			if(!tab.comm)
+			{
+				comm.unbind('profile-mod', arguments.callee);
+				return false;
+			}
+			tab.comm.trigger('profile-mod');
+		});
 		comm.bind('profile-sync', function() {
+			// make sure that if the tab was closed (pfff why would anyone close
+			// turtl, right?? I mean, RIGHT?!?!) that we clean up any event
+			// pushing to the tab
+			if(!tab.comm)
+			{
+				comm.unbind('profile-sync', arguments.callee);
+				return false;
+			}
 			var args	=	Array.prototype.slice.call(arguments, 0)
 			args		=	['profile-sync'].concat(args);
-			tabcomm.trigger.apply(tabcomm, args);
+			tab.comm.trigger.apply(tab.comm, args);
 		});
 
-		tabcomm.bind('profile-mod', function() {
+		tab.comm.bind('profile-mod', function() {
 			// the profile was modified by hand (`profile-mod` does its
 			// best to only be called via user-initiated action, not
 			// syncing), so signal the background app to do a sync
@@ -150,7 +187,7 @@ var ext	=	{
 			// the addon)
 			comm.trigger('do-sync');
 		});
-		tabcomm.bind('personas-add-open', function() { comm.trigger('personas-add-open'); });
+		tab.comm.bind('personas-add-open', function() { comm.trigger('personas-add-open'); });
 	},
 
 	/**
@@ -189,23 +226,32 @@ var ext	=	{
 			chrome.browserAction.enable();
 			chrome.browserAction.setPopup({popup: '/data/menu.html'});
 
+			var login_finish	=	function()
+			{
+				// update invites/badge
+				ext.invites.notify();
+				ext.update_badge();
+
+				// make sure if we have a persona, it's got an RSA key
+				var persona	=	app.turtl.user.get('personas').first();
+				if(persona && !persona.has_rsa({check_private: true}))
+				{
+					ext.personas.attach_rsa_key_to_persona(persona.toJSON());
+				}
+			};
+
 			if(options.join)
 			{
 				// if we're here, the personas dialog is already showing. wait
-				// for it to close then show the invites notification
+				// for it to close then finish logging in
 				comm.bind('panel-close', function() {
 					comm.unbind('panel-close', arguments.callee);
-					ext.invites.notify();
+					login_finish();
 				});
 			}
-			ext.invites.notify();
-			ext.update_badge();
-
-			// make sure if we have a persona, it's got an RSA key
-			var persona	=	app.turtl.user.get('personas').first();
-			if(persona && !persona.has_rsa({check_private: true}))
+			else
 			{
-				ext.personas.attach_rsa_key_to_persona(persona.toJSON());
+				login_finish();
 			}
 		});
 	},
@@ -216,9 +262,6 @@ var ext	=	{
 	do_logout: function(options)
 	{
 		options || (options = {});
-
-		// remove all events everywhere
-		if(!options.skip_unbind) comm.unbind();
 
 		// close all app tabs
 		chrome.tabs.remove(ext.app_tabs.map(function(tab) { return tab.id; }));
@@ -235,7 +278,7 @@ var ext	=	{
 	update_badge: function()
 	{
 		var badge	=	'';
-		if(app.turtl.user.logged_in)
+		if(app.turtl.user.logged_in && app.turtl.user.get('personas').models().length > 0)
 		{
 			badge	=	ext.invites.num_pending() + ext.messages.num_pending();
 			badge	=	badge.toString();
@@ -251,6 +294,27 @@ var ext	=	{
 // listen for tab closes and update our app tab list as needed
 chrome.tabs.onRemoved.addListener(function(tab_id, info) {
 	ext.close_app_tab(tab_id);
+});
+
+// listen for app tab refreshes
+chrome.tabs.onUpdated.addListener(function(tab_id, changeinfo, tab) {
+	var tabs	=	ext.find_app_tabs(tab_id);
+	if(tabs.length == 0) return;
+
+	tabs.each(function(tab) {
+		// if the tab was previously loaded and we're loading it again, close it
+		// and open a new tab
+		if(tab._loaded && changeinfo.status == 'loading')
+		{
+			ext.close_app_tab(tab_id, {do_close: true});
+			ext.open_app();
+		}
+
+		if(changeinfo.status == 'complete')
+		{
+			tab._loaded	=	true;
+		}
+	});
 });
 
 // listen for commands!
@@ -272,7 +336,7 @@ comm.bind('loaded', function() {
 });
 
 // this sets up the main menu
-ext.do_logout({skip_setup: true, skip_unbind: true});
+ext.do_logout({skip_setup: true});
 
 // determine what kind of run we're doing
 var cur_version		=	chrome.app.getDetails().version;
