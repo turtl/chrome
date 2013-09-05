@@ -262,6 +262,8 @@ var ext	=	{
 			path: '/data/app/favicon.19.gray.png'
 		});
 
+		ext.update_badge();
+
 		// run setup again
 		if(!options.skip_setup) ext.setup();
 	},
@@ -269,7 +271,7 @@ var ext	=	{
 	update_badge: function()
 	{
 		var badge	=	'';
-		if(app.turtl.user.logged_in && app.turtl.user.get('personas').models().length > 0)
+		if(app.turtl.user && app.turtl.user.logged_in && app.turtl.user.get('personas').models().length > 0)
 		{
 			badge	=	ext.invites.num_pending() + ext.messages.num_pending();
 			badge	=	badge.toString();

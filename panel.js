@@ -40,11 +40,11 @@ ext.panel	=	{
 		ext.panel.controller	=	new appclass(params);
 
 		comm.bind('addon-controller-release', function() {
-			comm.unbind('addon-controller-release', arguments.callee);
+			comm.unbind_context('panel:controller-release');
 			ext.panel.release();
-		});
+		}, 'panel:controller-release');
 		comm.bind('close', function() {
-			comm.unbind('close', arguments.callee);
+			comm.unbind_context('panel_close');
 			// get the current window (async)
 			// TODO: make this window-specific somehow (note that all attempts
 			// to do this reaonably have failed. windows.getCurrent and 
@@ -52,7 +52,7 @@ ext.panel	=	{
 			// popup search turn up empty).
 			var popup	=	chrome.extension.getViews({type: 'popup'})[0];
 			if(popup) popup.close();
-		});
+		}, 'panel:close');
 	},
 
 	release: function()
