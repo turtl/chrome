@@ -59,13 +59,21 @@ var menu	=	{
 		var body		=	document.body;
 		switch(url)
 		{
+		case 'app':
+			app.ext.open_app();
+			menu.close();
+			break;
 		case 'bookmark':
 			menu.show_panel();
 			app.ext.bookmark.open(body, bg_inject);
 			break;
-		case 'app':
-			app.ext.open_app();
-			menu.close();
+		case 'add-note':
+			menu.show_panel();
+			// note: need to figure out board selector
+			app.ext.panel.open(body, 'NoteEditController', {
+				inject: bg_inject,
+				edit_in_modal: false
+			}, {width: 750});
 			break;
 		case 'personas':
 			menu.show_panel();
@@ -142,7 +150,6 @@ window.addEvent('domready', function() {
 	app.comm.bind('rsa-pop', update_rsa_gen, 'panel');
 	update_rsa_gen();
 	var inp_rsa	=	rsagen.getElement('input[name=notify-rsa]');
-	console.log('inp: ', inp_rsa);
 	if(inp_rsa)
 	{
 		inp_rsa.checked	=	app.ext.personas.notify_rsa_gen;
