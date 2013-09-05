@@ -179,6 +179,19 @@ var ext	=	{
 			comm.trigger('do-sync');
 		});
 		tab.comm.bind('personas-add-open', function() { comm.trigger('personas-add-open'); });
+		tab.comm.bind('tab-unload', function() {
+			// we wait here because this may have been initiated from a tab
+			// close, in which case we don't actually want to do anything.
+			(function() {
+				// if tab was already closed, do nothing
+				if(!tab.comm) return false;
+
+				// tab was NOT closed! URL probably changed...close the tab and
+				// re-open
+				ext.close_app_tab(tab.id, {do_close: true});
+				ext.open_app();
+			}).delay(10, this);
+		});
 	},
 
 	/**
@@ -286,28 +299,8 @@ var ext	=	{
 
 // listen for tab closes and update our app tab list as needed
 chrome.tabs.onRemoved.addListener(function(tab_id, info) {
+	console.log('remove event');
 	ext.close_app_tab(tab_id);
-});
-
-// listen for app tab refreshes
-chrome.tabs.onUpdated.addListener(function(tab_id, changeinfo, tab) {
-	var tabs	=	ext.find_app_tabs(tab_id);
-	if(tabs.length == 0) return;
-
-	tabs.each(function(tab) {
-		// if the tab was previously loaded and we're loading it again, close it
-		// and open a new tab
-		if(tab._loaded && changeinfo.status == 'loading')
-		{
-			ext.close_app_tab(tab_id, {do_close: true});
-			ext.open_app();
-		}
-
-		if(changeinfo.status == 'complete')
-		{
-			tab._loaded	=	true;
-		}
-	});
 });
 
 // listen for commands!
