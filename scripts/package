@@ -29,7 +29,8 @@ echo "Copying live config over local"
 mv config.live.js config.js
 
 echo -n "Zipping..."
-zip -r turtl.crx \
+zip -qr -9 -X \
+	turtl.crx \
 	. \
 	-x *.git* \
 	-x turtl.zip \
