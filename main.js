@@ -255,6 +255,7 @@ var ext	=	{
 				comm.bind('panel-close', function() {
 					comm.unbind('panel-close', arguments.callee);
 					login_finish();
+					ext.open_app();
 				});
 			}
 			else
