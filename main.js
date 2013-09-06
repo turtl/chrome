@@ -162,9 +162,11 @@ var ext	=	{
 		// pass the tab object as the binding context (useful for unbinding all
 		// the tab's events later on)
 		comm.bind('profile-mod', function() {
+			if(!tab.comm) return false;
 			tab.comm.trigger('profile-mod');
 		}, tab);
 		comm.bind('profile-sync', function() {
+			if(!tab.comm) return false;
 			var args	=	Array.prototype.slice.call(arguments, 0)
 			args		=	['profile-sync'].concat(args);
 			tab.comm.trigger.apply(tab.comm, args);
