@@ -33,8 +33,7 @@ zip -qr -9 -X \
 	turtl.crx \
 	. \
 	-x *.git* \
-	-x turtl.zip \
-	-x turtl.crx \
+	-x release/* \
 	> /dev/null
 echo "done."
 
