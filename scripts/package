@@ -2,7 +2,7 @@
 
 # temp dir for packaging
 TMP=/tmp/turtl-package-chrome
-CRX=turtl.zip
+ZIP=release/turtl.zip
 
 nogen=$1
 
@@ -38,8 +38,8 @@ zip -qr -9 -X \
 	> /dev/null
 echo "done."
 
-mv turtl.crx $EXTDIR/$CRX || {
-	echo "Problem moving $TMP/turtl.crx to $EXTDIR/$CRX. Exiting."
+mv turtl.crx $EXTDIR/$ZIP || {
+	echo "Problem moving $TMP/turtl.crx to $EXTDIR/$ZIP. Exiting."
 	exit 1
 }
 popd > /dev/null
@@ -47,4 +47,4 @@ popd > /dev/null
 echo "Clearing tmp dir ($TMP/)"
 #rm -rf $TMP
 
-echo "Complete. Created fully-packaged extension: $CRX"
+echo "Complete. Created fully-packaged extension: $ZIP"
