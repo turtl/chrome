@@ -3,7 +3,7 @@
 
 	"name": "Turtl",
 	"description": "A client-side encrypted note storage app.",
-	"version": "0.1.5",
+	"version": "0.1.6",
 	"icons": {
 		"16": "data/app/favicon.png",
 		"128": "data/app/favicon.128.png"
