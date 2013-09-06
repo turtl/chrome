@@ -63,7 +63,9 @@ var ext	=	{
 
 		// bind to persona creationnnnnn, and attach an RSA key to new personas
 		comm.bind('persona-created', function(personadata) {
-			// we got a brand-spankin new persona. give it an RSA key.
+			// new persona! generate a key (unless it has one already)
+			var personas	=	turtl.user.get('personas');
+			if(personas.models().length == 1 && personas.first().has_rsa()) return;
 			ext.personas.attach_rsa_key_to_persona(personadata);
 		});
 
