@@ -33,6 +33,7 @@ var do_check_images	=	function()
 
 		var size	=	0;	// used to track largest image
 
+		// check <img> tags
 		for(var i = 0, n = images.length; i < n; i++)
 		{
 			var img		=	images[i];
@@ -45,6 +46,8 @@ var do_check_images	=	function()
 			}
 		}
 
+		// check <div> background images (a lot of sites user these instead of
+		// <img> tags).
 		for(var i = 0, n = divs.length; i < n; i++)
 		{
 			var div	=	divs[i];
@@ -66,6 +69,13 @@ var do_check_images	=	function()
 
 var finish	=	function()
 {
+	// if we have a good image, axe the description: it's NEVER helpful.
+	// seriously, meta descriptions are incredibly worthless
+	if(image) desc = '';
+
+	// if og_image sucks but we couldn't find another image, use it anyway
+	if(!image && og_image) image = og_image;
+
 	// formulate our complete response LOL
 	var send	=	{
 		image: image,
@@ -85,13 +95,16 @@ var finish	=	function()
 
 if(og_image)
 {
+	// we have an og:image ...is it big enough?
 	var img			=	new Image();
 	var loaded		=	false;
-	var cancelled	=	false;
+	var cancelled	=	false;	
 	img.onload = function() {
+		// we've been axed (probably took too long to load). do nothing
 		if(cancelled) return false;
 		loaded	=	true;
 		img.onload = null;
+		// if the og:image sucks, check our other options
 		if(!image_size_acceptable(img.width, img.height))
 		{
 			do_check_images();
@@ -99,14 +112,20 @@ if(og_image)
 		finish();
 	}.bind(this);
 	img.url	=	og_image;
-	setTimeout( function() {
+
+	// if loading the image takes longer than a second, fuck it, check the images
+	// on the page
+	setTimeout(function() {
+		// if og:image loaded already, just forget it
+		if(loaded) return false;
 		cancelled	=	true;
 		do_check_images();
 		finish();
-	}, 1000 );
+	}, 1000);
 }
 else
 {
+	// no og:image? find a big image to use!
 	do_check_images();
 	finish();
 }
