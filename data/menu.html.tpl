@@ -9,21 +9,7 @@
 		<link rel="stylesheet" href="app/css/reset.css">
 		<link rel="stylesheet" href="app/css/template.css">
 		<link rel="stylesheet" href="app/css/general.css">
-
-<link rel="stylesheet" href="app/css/ie.css">
-<link rel="stylesheet" href="app/css/messages.css">
-<link rel="stylesheet" href="app/css/modules/barfr.css">
-<link rel="stylesheet" href="app/css/modules/modal.css">
-<link rel="stylesheet" href="app/css/site/boards.css">
-<link rel="stylesheet" href="app/css/site/bookmark.css">
-<link rel="stylesheet" href="app/css/site/categories.css">
-<link rel="stylesheet" href="app/css/site/dashboard.css">
-<link rel="stylesheet" href="app/css/site/invites.css">
-<link rel="stylesheet" href="app/css/site/notes.css">
-<link rel="stylesheet" href="app/css/site/notifications.css">
-<link rel="stylesheet" href="app/css/site/personas.css">
-<link rel="stylesheet" href="app/css/site/tags.css">
-<link rel="stylesheet" href="app/css/site/users.css">
+{{gencss}}
 		<link rel="stylesheet" href="background.css">
 		<link rel="stylesheet" href="menu.css">
 		<style type="text/css">
@@ -84,3 +70,4 @@
 		</div>
 	</body>
 </html>
+
