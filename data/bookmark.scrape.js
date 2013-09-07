@@ -8,64 +8,106 @@ for(var x in meta)
 	break;
 }
 
+var og_image	=	null;
 for(var x in meta)
 {
 	if(meta[x].getAttribute && meta[x].getAttribute('property') == 'og:image')
 	{
-		image	=	meta[x].content;
+		og_image	=	meta[x].content;
 		break;
 	}
 }
 
-if(!image)
+var image_size_acceptable	=	function(width, height)
 {
-	var images	=	document.getElementsByTagName('img');
-	var divs	=	document.getElementsByTagName('div');
-
-	var size	=	0;	// used to track largest image
-
-	for(var i = 0, n = images.length; i < n; i++)
-	{
-		var img		=	images[i];
-		if(img.width < 150 || img.height < 150) continue;
-		var isize	=	img.width * img.height;
-		if(isize > size)
-		{
-			size	=	isize;
-			image	=	img.src;
-		}
-	}
-
-	for(var i = 0, n = divs.length; i < n; i++)
-	{
-		var div	=	divs[i];
-		if(!div.style.width || !div.style.height) continue;
-		if(!div.style.backgroundImage) continue;
-		if(div.style.width < 200 || div.style.height < 200) continue;
-		var img	=	new Image();
-		img.src	=	div.style.backgroundImage.replace(/^url\(['"]?/, '').replace(/['"]?\)$/, '');
-		if(img.width < 150 || img.height < 150) continue;
-		var isize	=	img.width * img.height;
-		if(isize > size)
-		{
-			size	=	isize;
-			image	=	img.src;
-		}
-	}
-}
-
-// formulate our complete response LOL
-var send	=	{
-	image: image,
-	desc: desc
+	if(width < 150 || height < 150) return false;
+	return true;
 };
 
-if(self && self.port)
+var do_check_images	=	function()
 {
-	self.port.emit('scraped', send);
+	if(!image)
+	{
+		var images	=	document.getElementsByTagName('img');
+		var divs	=	document.getElementsByTagName('div');
+
+		var size	=	0;	// used to track largest image
+
+		for(var i = 0, n = images.length; i < n; i++)
+		{
+			var img		=	images[i];
+			if(!image_size_acceptable(img.width, img.height)) continue;
+			var isize	=	img.width * img.height;
+			if(isize > size)
+			{
+				size	=	isize;
+				image	=	img.src;
+			}
+		}
+
+		for(var i = 0, n = divs.length; i < n; i++)
+		{
+			var div	=	divs[i];
+			if(!div.style.width || !div.style.height) continue;
+			if(!div.style.backgroundImage) continue;
+			if(div.style.width < 200 || div.style.height < 200) continue;
+			var img	=	new Image();
+			img.src	=	div.style.backgroundImage.replace(/^url\(['"]?/, '').replace(/['"]?\)$/, '');
+			if(img.width < 150 || img.height < 150) continue;
+			var isize	=	img.width * img.height;
+			if(isize > size)
+			{
+				size	=	isize;
+				image	=	img.src;
+			}
+		}
+	}
 }
-else if(chrome && chrome.runtime)
+
+var finish	=	function()
 {
-	chrome.runtime.sendMessage({type: 'bookmark-scrape', data: send});
+	// formulate our complete response LOL
+	var send	=	{
+		image: image,
+		desc: desc
+	};
+
+	if(self && self.port)
+	{
+		self.port.emit('scraped', send);
+	}
+	else if(chrome && chrome.runtime)
+	{
+		chrome.runtime.sendMessage({type: 'bookmark-scrape', data: send});
+	}
+
+};
+
+if(og_image)
+{
+	var img			=	new Image();
+	var loaded		=	false;
+	var cancelled	=	false;
+	img.onload = function() {
+		if(cancelled) return false;
+		loaded	=	true;
+		img.onload = null;
+		if(!image_size_acceptable(img.width, img.height))
+		{
+			do_check_images();
+		}
+		finish();
+	}.bind(this);
+	img.url	=	og_image;
+	setTimeout( function() {
+		cancelled	=	true;
+		do_check_images();
+		finish();
+	}, 1000 );
+}
+else
+{
+	do_check_images();
+	finish();
 }
 
