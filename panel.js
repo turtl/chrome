@@ -59,7 +59,7 @@ ext.panel	=	{
 	{
 		var controller	=	ext.panel.controller;
 		if(controller && controller.release) controller.release();
-	},
+	}
 };
 
 // listen dor connect/disconnect (lets us know when the panel opens/closes).

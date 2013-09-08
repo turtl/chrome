@@ -1,7 +1,7 @@
 ext.messages	=	{
 	init: function()
 	{
-		comm.bind('message-remove', function() {
+		comm.bind('num-messages', function() {
 			comm.trigger('invites-change');
 		});
 	},

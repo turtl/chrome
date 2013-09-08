@@ -110,7 +110,7 @@ ext.invites	=	{
 
 		chrome.notifications.create('invites', {
 			type: 'image',
-			title: 'You have pending invites',
+			title: 'You have invites',
 			message: 'Open the `Invites` dialog in the Turtl menu to start sharing.',
 			iconUrl: chrome.extension.getURL('data/app/favicon.128.png'),
 			imageUrl: chrome.extension.getURL('data/invites-open.png')

@@ -70,7 +70,7 @@ var ext	=	{
 		});
 
 		// listen for new messages/notifications
-		comm.bind('new-message', function() {
+		comm.bind('num-messages', function() {
 			// messages are folded into invites for now
 			ext.invites.notify();
 		});
