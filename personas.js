@@ -10,6 +10,9 @@ ext.personas	=	{
 		{
 			ext.personas.generate_rsa_key();
 		}
+		comm.bind('rsa-keypair', function(jsonkey) {
+			ext.personas.push_key(jsonkey);
+		});
 	},
 
 	open: function(container, inject, options)
@@ -67,7 +70,7 @@ ext.personas	=	{
 			success: function(rsakey) {
 				ext.personas.generating_key	=	false;
 				var jsonkey	=	app.tcrypt.rsa_key_to_json(rsakey);
-				ext.personas.push_key(jsonkey);
+				comm.trigger('rsa-keypair', jsonkey);
 			},
 			error: function(err) {
 				// shit shit shit
@@ -76,39 +79,41 @@ ext.personas	=	{
 		});
 	},
 
-	attach_rsa_key_to_persona: function(personadata)
+	attach_rsa_key_to_persona: function(persona_data)
 	{
-		var rsakey		=	ext.personas.pop_key();
-		var finishfn	=	function(rsakey)
+		var do_add_key	=	function(rsakey)
 		{
-			var persona	=	app.turtl.user.get('personas').find_by_id(personadata.id);
-			if(!persona)
-			{
-				ext.personas.push_key(rsakey);
-				return false;
-			}
-			persona.set_rsa(app.tcrypt.rsa_key_from_json(rsakey));
-			persona.save();
+			comm.trigger('persona-attach-key', rsakey, persona_data);
 		};
 
-		if(!rsakey)
+		// get a key from the RSA lib. if one isn't available, wait until one is
+		// and then stop listening and call do_add_key
+		var rsakey		=	ext.personas.pop_key();
+		if(rsakey)
+		{
+			// yess!! first try!
+			do_add_key(rsakey);
+		}
+		else
 		{
 			// if we aren't generating a key, do it since we need one
 			if(!ext.personas.generating_key) ext.personas.generate_rsa_key();
 			comm.bind('rsa-key', function() {
+				// try to grab a new key
 				var rsakey	=	ext.personas.pop_key();
+
+				// nope, didn't get a key this time (someone might have been
+				// ahead of us in line)
 				if(!rsakey)
 				{
 					if(!ext.personas.generating_key) ext.personas.generate_rsa_key();
 					return false;
 				}
+
+				// got a key! stop listening for new keys and finish up
 				comm.unbind('rsa-key', arguments.callee);
-				finishfn(rsakey);
+				do_add_key(rsakey);
 			});
-		}
-		else
-		{
-			finishfn(rsakey);
 		}
 	}
 };
