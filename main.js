@@ -343,5 +343,6 @@ else
 	if(comp < 0) ext.load_reason = 'downgrade';
 	if(comp == 0) ext.load_reason = 'open';
 }
+console.log('load reason: ', ext.load_reason);
 localStorage.version	=	cur_version;
 
