@@ -6,10 +6,12 @@ ext.personas	=	{
 	{
 		if(!localStorage.rsa_keys) localStorage.rsa_keys = '[]';
 		var keys	=	JSON.parse(localStorage.rsa_keys);
+		/*
 		if(keys.length == 0 && ext.load_reason == 'install')
 		{
 			ext.personas.generate_rsa_key();
 		}
+		*/
 		comm.bind('rsa-keypair', function(jsonkey) {
 			ext.personas.push_key(jsonkey);
 		});

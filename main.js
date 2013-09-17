@@ -64,8 +64,8 @@ var ext	=	{
 		// bind to persona creationnnnnn, and attach an RSA key to new personas
 		comm.bind('persona-created', function(personadata) {
 			// new persona! generate a key (unless it has one already)
-			var personas	=	turtl.user.get('personas');
-			if(personas.models().length == 1 && personas.first().has_rsa()) return;
+			var persona	=	app.turtl.user.get('personas').first();
+			if(persona && persona.has_rsa()) return;
 			ext.personas.attach_rsa_key_to_persona(personadata);
 		});
 
@@ -255,6 +255,7 @@ var ext	=	{
 				comm.bind('panel-close', function() {
 					comm.unbind('panel-close', arguments.callee);
 					login_finish();
+					// open the app once we're done
 					ext.open_app();
 				});
 			}
@@ -304,7 +305,6 @@ var ext	=	{
 
 // listen for tab closes and update our app tab list as needed
 chrome.tabs.onRemoved.addListener(function(tab_id, info) {
-	console.log('remove event');
 	ext.close_app_tab(tab_id);
 });
 
