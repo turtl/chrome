@@ -174,6 +174,9 @@ var ext	=	{
 			tab.comm.trigger.apply(tab.comm, args);
 		}, tab);
 
+		tab.comm.bind('logout', function() {
+			comm.trigger('logout');
+		});
 		tab.comm.bind('profile-mod', function() {
 			// the profile was modified by hand (`profile-mod` does its
 			// best to only be called via user-initiated action, not

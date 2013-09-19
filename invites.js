@@ -19,6 +19,7 @@ ext.invites	=	{
 		ext.invites.invite_valid(code, id, function(invite) {
 			// add in the key
 			invite.data.key	=	key;
+			console.log('invites: got valid! ', code);
 
 			// add the invite to persistent storage
 			var invites				=	JSON.parse(localStorage.invites);
