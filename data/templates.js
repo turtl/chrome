@@ -371,7 +371,7 @@ var action = note.id ? \'Edit\' : \'Add\';\
 		<div class="type quick">\
 			<textarea tabindex="1" name="quick" rows="8" cols="40" placeholder="Enter a link, text, image URL, etc"></textarea>\
 			<div class="form-note">\
-				Feel free to use <a href="http://daringfireball.net/projects/markdown/syntax" target="_blank">markdown</a> for note text.\
+				Feel free to use <a href="http://support.mashery.com/docs/customizing_your_portal/Markdown_Cheat_Sheet" target="_blank">markdown</a> for note text.\
 			</div>\
 		</div>\
 \
@@ -386,7 +386,7 @@ var action = note.id ? \'Edit\' : \'Add\';\
 		<div class="type text">\
 			<textarea tabindex="1" name="text" rows="8" cols="40" placeholder="Describe this note"><?=note.text?></textarea>\
 			<div class="form-note">\
-				Feel free to use <a href="http://daringfireball.net/projects/markdown/syntax" target="_blank">markdown</a> for note text.\
+				Feel free to use <a href="http://support.mashery.com/docs/customizing_your_portal/Markdown_Cheat_Sheet" target="_blank">markdown</a> for note text.\
 			</div>\
 		</div>\
 \
@@ -421,7 +421,7 @@ var action = note.id ? \'Edit\' : \'Add\';\
 _templates['notes/edit_tags'] = '<?\
 var format_tag = function(tagname, selected)\
 {\
-	var t = \'<li class="\'+view.tagetize(tagname).replace(/["]/g, \'\')+\' \'+(selected ? \'sel\': \'\')+\'">\';\
+var t = \'<li class="\'+view.tagetize(tagname, {escape: true})+\' \'+(selected ? \'sel\': \'\')+\'">\';\
 	t += view.tagetize(tagname);\
 	t += \'</li>\';\
 	return t;\
@@ -435,12 +435,12 @@ var format_tag = function(tagname, selected)\
 <? } else { ?>\
 	<ul class="tags clear">\
 		<? suggested_tags.each(function(tagname) { ?>\
-			<? var sel = note.tags ? note.tags.filter(function(t) { return t.name == tagname; }).length > 0 : false; ?>\
+			<? var sel = note.tags ? note.tags.filter(function(t) { return view.tagetize(t.name) == view.tagetize(tagname); }).length > 0 : false; ?>\
 			<?=format_tag(tagname, sel)?>\
 		<? }); ?>\
 		<? if(note.tags) { ?>\
 			<? note.tags.each(function(tag) { ?>\
-				<? if(suggested_tags.contains(tag.name)) { return; } ?>\
+				<? if(suggested_tags.contains(view.tagetize(tag.name))) { return; } ?>\
 				<?=format_tag(tag.name, true)?>\
 			<? }); ?>\
 		<? } ?>\
