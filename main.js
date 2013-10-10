@@ -81,14 +81,6 @@ var ext	=	{
 		});
 	},
 
-	find_app_tabs: function(tab_id)
-	{
-		return ext.app_tabs.filter(function(tab) {
-			// if the tab is being removed, unbind its comm object
-			return (tab.id == tab_id)
-		});
-	},
-
 	/**
 	 * Called when we wish to open the Turtl app in a tab. If turtl already
 	 * exists in a tab in this window, we activate that tab (instead of opening
@@ -101,35 +93,36 @@ var ext	=	{
 		chrome.windows.getLastFocused(function(win) {
 			// check if this window has an app tab already
 			var window_id	=	win.id;
-			for(var i = 0, n = ext.app_tabs.length; i < n; i++)
-			{
-				var tab	=	ext.app_tabs[i];
-				if(tab.windowId == window_id)
+			chrome.tabs.query({windowId: window_id}, function(tabs) {
+				var tab	=	tabs.filter(function(t) {
+					return t.url.match(chrome.extension.getURL('/'));
+				});
+				if(tab[0])
 				{
-					// yes, we have an app tab, activate it and return
-					chrome.tabs.update(tab.id, {selected: true});
+					// found a tab! select the first one
+					chrome.tabs.update(tab[0].id, {selected: true});
 					return true;
 				}
-			}
 
-			// no app tab for this window! create one.
-			chrome.tabs.create({
-				url: chrome.extension.getURL('/data/index.html'),
-			}, function(tab) {
-				// set up a PERSONALIZED comm for this tab, allowing it to pass
-				// its own events around without muddying up our global comm
-				// object
-				tab.comm	=	new Comm();
-				ext.setup_tab(tab);
+				// no app tab for this window! create one.
+				chrome.tabs.create({
+					url: chrome.extension.getURL('/data/index.html'),
+				}, function(tab) {
+					// set up a PERSONALIZED comm for this tab, allowing it to pass
+					// its own events around without muddying up our global comm
+					// object
+					tab.comm	=	new Comm();
+					ext.setup_tab(tab);
 
-				// track the tab/window pair
-				ext.app_tabs.push(tab);
+					// track the tab/window pair
+					ext.app_tabs.push(tab);
 
-				// track last opened tab so it can grab its own comm object from
-				// ext once it runs its setup. bit of a hack, but hoesntly works
-				// 10x better than trying to pull out the window object via
-				// ext.getViews() and trying to time the injection right. ugh.
-				ext.last_opened_tab	=	tab;
+					// track last opened tab so it can grab its own comm object from
+					// ext once it runs its setup. bit of a hack, but hoesntly works
+					// 10x better than trying to pull out the window object via
+					// ext.getViews() and trying to time the injection right. ugh.
+					ext.last_opened_tab	=	tab;
+				});
 			});
 		});
 	},
@@ -145,6 +138,7 @@ var ext	=	{
 			// if the tab is being removed, unbind its comm object
 			if(tab.id == tab_id)
 			{
+				console.log('tab: '+ tab_id +': unbind comm');
 				tab.comm.unbind();
 				tab.comm	=	false;
 				comm.unbind_context(tab);
@@ -189,14 +183,24 @@ var ext	=	{
 		tab.comm.bind('tab-unload', function() {
 			// we wait here because this may have been initiated from a tab
 			// close, in which case we don't actually want to do anything.
+			if(!tab.comm) return false;
 			(function() {
-				// if tab was already closed, do nothing
-				if(!tab.comm) return false;
-
-				// tab was NOT closed! URL probably changed...close the tab and
-				// re-open
-				ext.close_app_tab(tab.id, {do_close: true});
-				ext.open_app();
+				chrome.tabs.get(tab.id, function(query_tab) {
+					if(!tab.comm) return false;
+					console.log('tab: change: onapp: ', query_tab.url.match(chrome.extension.getURL('/')));
+					if(!query_tab.url.match(chrome.extension.getURL('/')))
+					{
+						// tab URL changed! unbind the comm/untrack tab
+						ext.close_app_tab(tab.id);
+					}
+					else
+					{
+						// tab was reloaded, need to re-setup comm
+						console.log('open tab');
+						ext.close_app_tab(tab.id, {do_close: true});
+						ext.open_app.delay(100, this);
+					}
+				});
 			}).delay(10, this);
 		});
 	},
