@@ -175,7 +175,7 @@ var ext	=	{
 		}, tab);
 
 		tab.comm.bind('logout', function() {
-			comm.trigger('logout');
+			app.turtl.user.logout();
 		});
 		tab.comm.bind('profile-mod', function() {
 			// the profile was modified by hand (`profile-mod` does its
