@@ -157,27 +157,8 @@ var ext	=	{
 		// forward some background comm events to this tab's comm. note that we
 		// pass the tab object as the binding context (useful for unbinding all
 		// the tab's events later on)
-		comm.bind('profile-mod', function() {
-			if(!tab.comm) return false;
-			tab.comm.trigger('profile-mod');
-		}, tab);
-		comm.bind('profile-sync', function() {
-			if(!tab.comm) return false;
-			var args	=	Array.prototype.slice.call(arguments, 0)
-			args		=	['profile-sync'].concat(args);
-			tab.comm.trigger.apply(tab.comm, args);
-		}, tab);
-
 		tab.comm.bind('logout', function() {
 			app.turtl.user.logout();
-		});
-		tab.comm.bind('profile-mod', function() {
-			// the profile was modified by hand (`profile-mod` does its
-			// best to only be called via user-initiated action, not
-			// syncing), so signal the background app to do a sync
-			// (which should propagate through the rest of the pieces of
-			// the addon)
-			comm.trigger('do-sync');
 		});
 		tab.comm.bind('personas-add-open', function() { comm.trigger('personas-add-open'); });
 		tab.comm.bind('tab-unload', function() {
@@ -187,7 +168,6 @@ var ext	=	{
 			(function() {
 				chrome.tabs.get(tab.id, function(query_tab) {
 					if(!tab.comm) return false;
-					console.log('tab: change: onapp: ', query_tab.url.match(chrome.extension.getURL('/')));
 					if(!query_tab.url.match(chrome.extension.getURL('/')))
 					{
 						// tab URL changed! unbind the comm/untrack tab
