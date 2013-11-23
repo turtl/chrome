@@ -11,8 +11,9 @@ ext.personas	=	{
 			ext.personas.notify();
 			ext.personas.generating_key	=	false;
 		});
-		comm.bind('rsa-keygen-error', function() {
+		comm.bind('rsa-keygen-error', function(err) {
 			ext.personas.generating_key	=	false;
+			console.log('RSA: error: ', err);
 		})
 	},
 
