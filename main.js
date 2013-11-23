@@ -61,14 +61,6 @@ var ext	=	{
 			comm.unbind_context('panel');
 		});
 
-		// bind to persona creationnnnnn, and attach an RSA key to new personas
-		comm.bind('persona-created', function(personadata) {
-			// new persona! generate a key (unless it has one already)
-			var persona	=	app.turtl.user.get('personas').first();
-			if(persona && persona.has_rsa()) return;
-			ext.personas.attach_rsa_key_to_persona(personadata);
-		});
-
 		// listen for new messages/notifications
 		comm.bind('num-messages', function() {
 			// messages are folded into invites for now
@@ -231,7 +223,7 @@ var ext	=	{
 				var persona	=	app.turtl.user.get('personas').first();
 				if(persona && !persona.has_rsa({check_private: true}))
 				{
-					ext.personas.attach_rsa_key_to_persona(persona.toJSON());
+					persona.generate_rsa_key();
 				}
 			};
 
