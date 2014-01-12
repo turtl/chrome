@@ -193,7 +193,7 @@ var ext	=	{
 		else
 		{
 			chrome.browserAction.setIcon({
-				path: '/data/app/favicon.19.png'
+				path: '/data/app/images/favicon.19.png'
 			});
 		}
 	},
@@ -257,7 +257,7 @@ var ext	=	{
 
 		chrome.browserAction.setPopup({popup: '/data/user.html'});
 		chrome.browserAction.setIcon({
-			path: '/data/app/favicon.19.gray.png'
+			path: '/data/app/images/favicon.19.gray.png'
 		});
 
 		ext.update_badge();

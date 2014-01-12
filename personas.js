@@ -40,7 +40,7 @@ ext.personas	=	{
 				type: 'basic',
 				title: 'RSA key generation complete',
 				message: 'You can now share with others!',
-				iconUrl: chrome.extension.getURL('data/app/favicon.128.png')
+				iconUrl: chrome.extension.getURL('data/app/images/favicon.128.png')
 			}, function() {});
 		}
 	}
