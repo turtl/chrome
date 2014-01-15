@@ -4,15 +4,6 @@
 TMP=/tmp/turtl-package-chrome
 ZIP=release/turtl.zip
 
-nogen=$1
-
-if [ "$nogen" != "--skip-tpl" ]; then
-	# generate templates
-	echo -n "Regenerating templates so we have the freshest versions..."
-	./scripts/generate-templates
-	echo "done."
-fi
-
 rm -rf $TMP/*
 
 echo -n "Copying extension files to temp directory..."
