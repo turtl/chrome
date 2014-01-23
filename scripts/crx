@@ -2,13 +2,8 @@
 #
 # Purpose: Pack a Chromium extension directory into crx format
 
-if test $# -lt 1  || [ "$1" == "--skip-tpl" ]; then
-  echo "Usage: $0 <pem path> [--skip-tpl]"
-  exit 1
-fi
-
 dir=.
-key=$1
+key=./scripts/sign.crx.pem
 skiptpl=$2
 name=turtl
 zip="release/$name.zip"

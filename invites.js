@@ -77,7 +77,7 @@ ext.invites	=	{
 			}
 		});
 
-		// note only do we look for invites on new tabs, but also loop over all
+		// not only do we look for invites on new tabs, but also loop over all
 		// current tabs and find any matching (existing) tabs. this allows a user
 		// to install the addon from an invite page and have the addon track the
 		// invite instantly.
