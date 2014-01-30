@@ -7,7 +7,7 @@ key=./scripts/sign.crx.pem
 skiptpl=$2
 name=turtl
 zip="release/$name.zip"
-crx="release/$name.crx"
+crx="release/chrome.crx"
 pub="release/$name.pub"
 sig="release/$name.sig"
 trap 'rm -f "$pub" "$sig"' EXIT
