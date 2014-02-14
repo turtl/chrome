@@ -7,7 +7,7 @@ ZIP=release/turtl.zip
 rm -rf $TMP/*
 
 echo -n "Copying extension files to temp directory..."
-cp -R -L . $TMP/ 2>&1 | grep -v '.git'
+rsync -avk . $TMP/ --exclude=".git" --exclude="data/app/.git" > /dev/null
 echo "done."
 
 EXTDIR=`realpath .`
@@ -18,6 +18,7 @@ echo "Packaging extension."
 
 echo "Copying live config over local"
 mv config.live.js config.js
+mv config.app.js data/app/config/config.js
 
 echo -n "Zipping..."
 zip -qr -9 -X \
@@ -35,6 +36,6 @@ mv turtl.crx $EXTDIR/$ZIP || {
 popd > /dev/null
 
 echo "Clearing tmp dir ($TMP/)"
-#rm -rf $TMP
+rm -rf $TMP
 
 echo "Complete. Created fully-packaged extension: $ZIP"
