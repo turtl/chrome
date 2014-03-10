@@ -218,13 +218,6 @@ var ext	=	{
 				// update invites/badge
 				ext.invites.notify();
 				ext.update_badge();
-
-				// make sure if we have a persona, it's got an RSA key
-				var persona	=	app.turtl.user.get('personas').first();
-				if(persona && !persona.has_rsa({check_private: true}))
-				{
-					persona.generate_rsa_key();
-				}
 			};
 
 			if(options.join)

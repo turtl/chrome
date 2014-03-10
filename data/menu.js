@@ -134,34 +134,5 @@ window.addEvent('domready', function() {
 		atag.set('html', atag.get('html') + ' ('+ num_total +')');
 		atag.setStyle('font-weight', 'bold');
 	}
-
-	// update for RSA generation
-	var rsagen	=	document.body.getElement('.rsa-gen');
-	var update_rsa_gen	=	function()
-	{
-		var is_gen	=	app.ext.personas.generating_key;
-		if(!menu.in_menu) return false;
-		if(!rsagen) return;
-		rsagen.setStyle('display', is_gen ? 'block' : '');
-		menu.reset_height();
-	};
-	app.comm.bind('rsa-gen', update_rsa_gen, 'panel');
-	app.comm.bind('rsa-key', update_rsa_gen, 'panel');
-	app.comm.bind('rsa-pop', update_rsa_gen, 'panel');
-	update_rsa_gen();
-	var inp_rsa	=	rsagen.getElement('input[name=notify-rsa]');
-	if(inp_rsa)
-	{
-		inp_rsa.checked	=	app.ext.personas.notify_rsa_gen;
-		inp_rsa.addEvent('change', function(e) {
-			var inp	=	e.target;
-			var on	=	inp.checked;
-			console.log('change: ', on);
-			app.ext.personas.notify_rsa_gen	=	on;
-		});
-	}
-
-	// clear RSA notifications when opened
-	chrome.notifications.clear('rsa-done', function() {});
 });
 
