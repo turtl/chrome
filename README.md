@@ -1,21 +1,11 @@
-Turtl for Chrome
-================
-This houses the source code for the Turtl Chrome extension.
+Turtl for Chrome (deprecated)
+=============================
 
-Setup
------
-Create a symlink from `data/app/` -> `/path/to/turtl-js`.
+This houses the source code for the old Turtl Chrome extension.
 
-Packaging
----------
-To build/package the extension, just run the `package` script from the root
-directory:
+It has been replaced by the Chrome [bookmarking extension](https://github.com/turtl/chrome-bookmarker).
+Instead of running Turtl in the browser, the new extension just sends
+bookmarking data directly to the Turtl desktop app.
 
-```bash
-cd /path/to/turtl/firefox
-./scripts/package
-```
-
-This builds an xpi file in the `release/` directory.
 
 
